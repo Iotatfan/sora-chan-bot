@@ -1,2 +1,3 @@
 # iotatfans-diva
-Discord Music Player
+
+Just another Discord Music Bot
