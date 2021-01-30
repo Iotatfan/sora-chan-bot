@@ -1,0 +1,9 @@
+node_modules
+build
+.env
+.vscode
+.eslintrc.json
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+script

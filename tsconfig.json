@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "esModuleInterop": true,
+      "lib": [
+        "es6",
+        "dom"
+      ],
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "outDir": "build",
+      "paths": { "*": ["typings/*"] },
+      "resolveJsonModule": true,
+      "rootDir": "src",
+      "sourceMap": true,
+      "target": "es2016",
+      "types": [
+        // add node as an option
+        "node",
+        "reflect-metadata"
+      ],
+      "typeRoots": [
+        // add path to @types
+        "node_modules/@types"
+      ],
+    },
+    "exclude": [
+      "node_modules"
+    ]
+  }
