@@ -1,8 +1,10 @@
 import { Command } from 'discord-akairo'
-import { Message, VoiceChannel } from 'discord.js'
+import { Message } from 'discord.js'
 import { ServerQueue, Track } from '../../../typings'
-import QueryType from '../util/queryType'
-import Queue from '../../models/queue'
+import Spotify from 'spotify-url-info'
+import QueryResolver from '../utils/queryType'
+import PermissionCheck from '../utils/permissionCheck'
+import SearchYoutubeVideo from '../utils/search'
 import ytdl = require('ytdl-core')
 import ytpl = require('ytpl')
 
@@ -10,15 +12,13 @@ export default class PlayCommand extends Command {
 
     private currentList: ServerQueue
     private message: Message
-    private resolver
+    private searchYtVideo: SearchYoutubeVideo = new SearchYoutubeVideo()
 
     constructor() {
         super('play', {
             aliases: ['play', 'p'],
             description: 'Play or Add Music to Queue'
         })
-
-        this.resolver = QueryType
     }
 
     public async exec(message: Message) {
@@ -26,39 +26,62 @@ export default class PlayCommand extends Command {
         const voiceChannel = message.member.voice.channel
         const query = message.content.substr(message.content.indexOf(' ')+1)
         
-        if (!voiceChannel) {
-            return message.channel.send(
-                "Please join the voice channel first, I'll follow you"
-            )
-        } 
-            
         this.currentList = await this.client.getQueue(message.guild.id)
         this.currentList.voiceChannel = voiceChannel
-
+        
+        if (!PermissionCheck.isInVoiceChannel(message, this.currentList)) return
+        
         this.resolveQueryType(query)
                 
     }
    
     private resolveQueryType (query) {
-        if (this.resolver.isYTPlaylist(query)) {
-            this._handlePlaylist(query)
+        if (QueryResolver.isYTPlaylist(query)) {
+            this._handleYtPlaylist(query)
+        } else if (QueryResolver.isYTVideo(query)) {
+            this._handleYtVideo(query)
+        } else if (QueryResolver.isSpotifyPlaylist(query)) {
+            this._handleYtVideo(query)
         } else {
-            return 'search'
+            this._searchYtVideo(query)
         }
     }
 
-    private async _handlePlaylist(query) {
+    private async _handleSpotifyPlaylist(query) {
+
+    }
+
+    private async _searchYtVideo(query) {
+        const track: Track = await this.searchYtVideo.search(this.message, query)
+        this.currentList.tracks.push(track)
+        this.join()
+    }
+
+    private async _handleYtPlaylist(query) {
         const playlistID = await ytpl.getPlaylistID(query)
         const playlist = await ytpl(playlistID)
         for (let item of playlist.items) {
             const track: Track = {
-                url: item.url,
                 thumbnail: item.bestThumbnail.url,
                 title: item.title,
+                url: item.url,
                 user: this.message.author.id
             }
             this.currentList.tracks.push(track)
         }
+        this.join()
+    }
+
+    private async _handleYtVideo(query) {
+        const trackInfo = await ytdl.getInfo(query)
+
+        const track: Track = {
+            thumbnail: trackInfo.videoDetails.thumbnails[0].url,
+            title: trackInfo.videoDetails.title,
+            url: trackInfo.videoDetails.video_url,
+            user: this.message.author.id
+        }
+        this.currentList.tracks.push(track)
         this.join()
     }
 
