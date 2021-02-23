@@ -1,35 +1,36 @@
-import { AkairoClient, CommandHandler, InhibitorHandler, ListenerHandler } from 'discord-akairo';
-import { Collection, Message } from 'discord.js';
-import { ServerQueue, Track } from '../../typings'
+import { AkairoClient, CommandHandler, ListenerHandler } from 'discord-akairo';
+import { ServerQueue } from '../../typings'
 
 export default class BotClient extends AkairoClient {
     constructor() {
-        super()
-
-        // this.commandHandler.resolver.addType('music', (_, phrase: string) => {
-        //     if (!phrase) return null;
-        //     if (phrase.length <= 2) return null;
-      
-        //     return phrase.replace(/<(.+)>/, '$1');
-        // });
-
+        super({
+            ownerID: process.env.OWNER_ID,
+        })
+        
     }
 
-    private readonly prefix = process.env.PREFIX
-
-    public readonly token = process.env.TOKEN 
-
-    public commandHandler = new CommandHandler(this, {
+    public commandHandler: CommandHandler = new CommandHandler(this, {
         allowMention: true,
         commandUtil: true,
         directory: __dirname + '/../commands',
-        prefix: this.prefix
+        defaultCooldown: 5000,
+        prefix: process.env.PREFIX
     })
+
+    public listenerHandler = new ListenerHandler(this, {
+        directory: __dirname + '/../listeners'
+    });
 
     public queues = this.util.collection<String, ServerQueue>()
     
     private async _init() {
+        this.listenerHandler.setEmitters({
+            commandHandler: this.commandHandler,
+            listenerHandler: this.listenerHandler
+        })
+        this.commandHandler.useListenerHandler(this.listenerHandler);
         this.commandHandler.loadAll()
+        this.listenerHandler.loadAll();
     }
 
     public async getQueue (guildID: String) {
@@ -50,15 +51,19 @@ export default class BotClient extends AkairoClient {
     }
 
     public async setQueue (guildID: String, values) {
-        console.log('Creating Queue ')
         this.queues.set(guildID, values)
 
         return this.getQueue(guildID)
     }
 
+    public async clearQueue (guildID: String) {
+        this.queues.delete(guildID)
+    }
+
     public async listen() {
         await this._init()
 
-        return this.login(this.token)
+        return this.login(process.env.TOKEN)
     }
+    
 }

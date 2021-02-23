@@ -8,6 +8,7 @@ interface BotClient {
     
     getQueue(guildID: String): Promise<ServerQueue>
     setQueue(guildID: String, values: ServerQueue): Promise<ServerQueue>
+    clearQueue(guildID: String): void
 }
 
 declare module 'discord.js' {
@@ -24,7 +25,6 @@ export interface ServerQueue {
 
 export interface Track {
     url: String
-    thumbnail: String
     title: String
     user: String
 }

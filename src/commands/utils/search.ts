@@ -3,7 +3,7 @@ import { Track } from '../../../typings'
 import ytsr = require('ytsr')
 
 export default class SearchYoutubeVideo {
-    private response: string
+    private response: string = null
     private track: Track
     private query: String
 
@@ -19,7 +19,12 @@ export default class SearchYoutubeVideo {
         }
         const searchResults = (await ytsr(filter1.url, options)).items
         
-        await this.waitUserResponse(message, searchResults)
+        try {
+            await this.waitUserResponse(message, searchResults)
+
+        } catch (e) {
+            message.channel.send('Invalid input')
+        }
 
         return this.track
     }
@@ -54,7 +59,7 @@ export default class SearchYoutubeVideo {
             message.reply("Message Timeout")
         })
 
-        this.addToQueue(message, searchResults)
+        if (this.response) this.addToQueue(message, searchResults)
 
     }
 
@@ -64,7 +69,6 @@ export default class SearchYoutubeVideo {
         if (!searchResults[index]) return message.reply("Invalid Number")
 
         this.track = {
-            thumbnail: searchResults[index].thumbnails[0].url,
             title: searchResults[index].title,
             url: searchResults[index].url,
             user: message.author.id
@@ -73,7 +77,6 @@ export default class SearchYoutubeVideo {
         const embed = new MessageEmbed()
             .setColor('00FF00')
             .setTitle('Added to Queue')
-            .setThumbnail(this.track.thumbnail.toString())
             .setURL(this.track.url.toString())
             .setDescription(`${this.track.title}`)
             

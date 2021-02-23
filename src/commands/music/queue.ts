@@ -12,12 +12,14 @@ export default class QueueCommand extends Command {
 
     public async exec(message: Message) {
         const currentList : ServerQueue = await this.client.getQueue(message.guild.id)
-        const tracks = currentList.tracks
         
+        if (!currentList.playing) return message.reply("Nothing to Play")
+        
+        const tracks = currentList.tracks
+                
         const embed = new MessageEmbed()
             .setColor('00FF00')
             .setTitle('Now Playing')
-            .setThumbnail(tracks[0].thumbnail.toString())
             .setURL(tracks[0].url.toString())
             .setDescription(`${tracks[0].title}`)
             .addFields(

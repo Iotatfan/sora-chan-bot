@@ -12,9 +12,8 @@ client.on('error', (err) => {
     client.user.setActivity(
     err.message,
     {
-        type: 'CUSTOM_STATUS'
+        type: 'PLAYING'
     })
 })
-
 
 client.listen()

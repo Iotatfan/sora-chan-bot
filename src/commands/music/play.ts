@@ -16,7 +16,7 @@ export default class PlayCommand extends Command {
 
     constructor() {
         super('play', {
-            aliases: ['play', 'p'],
+            aliases: ['Play', 'p'],
             description: 'Play or Add Music to Queue'
         })
     }
@@ -30,7 +30,7 @@ export default class PlayCommand extends Command {
         this.currentList.voiceChannel = voiceChannel
         
         if (!PermissionCheck.isInVoiceChannel(message, this.currentList)) return
-        
+
         this.resolveQueryType(query)
                 
     }
@@ -53,6 +53,9 @@ export default class PlayCommand extends Command {
 
     private async _searchYtVideo(query) {
         const track: Track = await this.searchYtVideo.search(this.message, query)
+
+        if (!track) return
+
         this.currentList.tracks.push(track)
         this.join()
     }
@@ -62,7 +65,6 @@ export default class PlayCommand extends Command {
         const playlist = await ytpl(playlistID)
         for (let item of playlist.items) {
             const track: Track = {
-                thumbnail: item.bestThumbnail.url,
                 title: item.title,
                 url: item.url,
                 user: this.message.author.id
@@ -76,7 +78,6 @@ export default class PlayCommand extends Command {
         const trackInfo = await ytdl.getInfo(query)
 
         const track: Track = {
-            thumbnail: trackInfo.videoDetails.thumbnails[0].url,
             title: trackInfo.videoDetails.title,
             url: trackInfo.videoDetails.video_url,
             user: this.message.author.id
@@ -99,9 +100,17 @@ export default class PlayCommand extends Command {
 
     private play(track: Track) {
         if (!track) {
-            this.currentList.voiceChannel.leave()
+            this.currentList.playing = false
+            this.client.user.setActivity('Chillin',{
+                type: 'CUSTOM_STATUS'
+            })
             return
         }
+
+        this.currentList.playing = true
+        this.client.user.setActivity(track.title.toString(), {
+            type: 'LISTENING'
+        })
 
         this.currentList
             .connection
@@ -111,6 +120,13 @@ export default class PlayCommand extends Command {
             }))
             .on('finish', () => {
                 this.currentList.tracks.shift()
+                this.play(this.currentList.tracks[0])
+            })
+            .on('error', err => {
+                console.log(err)
+
+                if (err.code === 'EPIPE') return this.play(this.currentList.tracks[0])
+
                 this.play(this.currentList.tracks[0])
             })
     }
