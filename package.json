@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node build/index.js",
     "watch": "tsc -p tsconfig.json -w",
+    "build": "tsc",
     "test": "mocha -r ts-node/register \"tests/**/*.spec.ts\""
   },
   "repository": {
@@ -25,6 +26,7 @@
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "inversify": "^5.0.5",
+    "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
     "spotify-url-info": "^2.2.0",
     "typescript": "^4.1.3",

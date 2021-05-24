@@ -27,13 +27,10 @@ export default class QueueCommand extends Command {
             { name: 'Up Next', value: '\u200B', inline: false }
         )
 
-        let length = tracks.length
-        if (length > 11) length = 11
-        if (length > 1) {
-        for (let i = 1; i < length; i++) {
-            embed.addField(`${i}.  ${tracks[i].title}`, `Requested by: <@${tracks[i].user}>`, false)
-            }
-        }
+        tracks
+            .filter((track, index) => index > 0 && index < 11)
+            .forEach((track, index) => embed.addField(`${index+1}. ${track.title} `, `Requested by: <@${track.user}>`,false) )
+
         message.channel.send(embed)
     }
 }

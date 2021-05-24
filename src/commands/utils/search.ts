@@ -36,9 +36,7 @@ export default class SearchYoutubeVideo {
             .setColor('00FF00')
             .setTitle(`Search Result for ${this.query}`)
 
-        for (let i = 0; i < 5; i++) {
-            embed.addField(`${i+1}. ${searchResults[i].title}`, '\u200B', false)
-        }
+        searchResults.forEach((result, index) => embed.addField(`${index+1}. ${result.title}`, '\u200B', false))
         
         message.channel.send(embed)
             .then(msg => msg.delete({

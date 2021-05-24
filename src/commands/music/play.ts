@@ -62,15 +62,17 @@ export default class PlayCommand extends Command {
 
     private async _handleYtPlaylist(query) {
         const playlistID = await ytpl.getPlaylistID(query)
-        const playlist = await ytpl(playlistID)
-        for (let item of playlist.items) {
-            const track: Track = {
+        const playlist = await ytpl(playlistID) 
+
+        playlist.items.forEach(item => {
+            let track: Track = {
                 title: item.title,
                 url: item.url,
                 user: this.message.author.id
             }
             this.currentList.tracks.push(track)
-        }
+        })
+        
         this.join()
     }
 
