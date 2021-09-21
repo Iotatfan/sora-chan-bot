@@ -11,25 +11,25 @@ export default class QueueCommand extends Command {
     }
 
     public async exec(message: Message) {
-        const currentList : ServerQueue = await this.client.getQueue(message.guild.id)
-        
+        const currentList: ServerQueue = await this.client.getQueue(message.guild.id)
+
         if (!currentList.playing) return message.reply("Nothing to Play")
-        
+
         const tracks = currentList.tracks
-                
+
         const embed = new MessageEmbed()
             .setColor('00FF00')
             .setTitle('Now Playing')
             .setURL(tracks[0].url.toString())
             .setDescription(`${tracks[0].title}`)
             .addFields(
-            { name: '\u200B', value: '\u200B', inline: false },
-            { name: 'Up Next', value: '\u200B', inline: false }
-        )
+                { name: '\u200B', value: '\u200B', inline: false },
+                { name: 'Up Next', value: '\u200B', inline: false }
+            )
 
         tracks
             .filter((track, index) => index > 0 && index < 11)
-            .forEach((track, index) => embed.addField(`${index+1}. ${track.title} `, `Requested by: <@${track.user}>`,false) )
+            .forEach((track, index) => embed.addField(`${index + 1}. ${track.title} `, `Requested by: <@${track.user}>`, false))
 
         message.channel.send(embed)
     }

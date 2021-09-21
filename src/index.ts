@@ -10,10 +10,10 @@ client.on('ready', () => {
 client.on('error', (err) => {
     console.log("Error")
     client.user.setActivity(
-    err.message,
-    {
-        type: 'PLAYING'
-    })
+        err.message,
+        {
+            type: 'CUSTOM_STATUS'
+        })
 })
 
 client.listen()

@@ -2,10 +2,10 @@ import { Message } from 'discord.js'
 import { ServerQueue } from '../../../typings'
 
 export default class PermissionCheck {
-    
+
     static isInVoiceChannel(message: Message, currentList: ServerQueue) {
         const userVoiceChannel = message.member.voice.channel
-        const botVoiceChannel = currentList.voiceChannel 
+        const botVoiceChannel = currentList.voiceChannel
 
         if (!userVoiceChannel) {
             message.channel.send(

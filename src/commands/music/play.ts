@@ -1,7 +1,7 @@
 import { Command } from 'discord-akairo'
 import { Message } from 'discord.js'
 import { ServerQueue, Track } from '../../../typings'
-import Spotify from 'spotify-url-info'
+import SpotifyWebApi from 'spotify-url-info'
 import QueryResolver from '../utils/queryType'
 import PermissionCheck from '../utils/permissionCheck'
 import SearchYoutubeVideo from '../utils/search'
@@ -24,35 +24,38 @@ export default class PlayCommand extends Command {
     public async exec(message: Message) {
         this.message = message
         const voiceChannel = message.member.voice.channel
-        const query = message.content.substr(message.content.indexOf(' ')+1)
-        
+        const query = message.content.substr(message.content.indexOf(' ') + 1)
         this.currentList = await this.client.getQueue(message.guild.id)
         this.currentList.voiceChannel = voiceChannel
-        
+
         if (!PermissionCheck.isInVoiceChannel(message, this.currentList)) return
 
         this.resolveQueryType(query)
-                
     }
-   
-    private resolveQueryType (query) {
+
+    private resolveQueryType(query) {
         if (QueryResolver.isYTPlaylist(query)) {
             this._handleYtPlaylist(query)
         } else if (QueryResolver.isYTVideo(query)) {
             this._handleYtVideo(query)
         } else if (QueryResolver.isSpotifyPlaylist(query)) {
-            this._handleYtVideo(query)
+            this._handleSpotifyPlaylist(query)
         } else {
-            this._searchYtVideo(query)
+            this._searchYtVideo(query, true)
         }
     }
 
     private async _handleSpotifyPlaylist(query) {
+        let data = await SpotifyWebApi.getTracks(query)
+
+        data.forEach(item => {
+            const searchString = `${item.artists[0].name} ${item.name}`
+            this._searchYtVideo(searchString, false)
+        })
 
     }
-
-    private async _searchYtVideo(query) {
-        const track: Track = await this.searchYtVideo.search(this.message, query)
+    private async _searchYtVideo(searchString, wait) {
+        const track: Track = await this.searchYtVideo.search(this.message, searchString, wait)
 
         if (!track) return
 
@@ -62,7 +65,7 @@ export default class PlayCommand extends Command {
 
     private async _handleYtPlaylist(query) {
         const playlistID = await ytpl.getPlaylistID(query)
-        const playlist = await ytpl(playlistID) 
+        const playlist = await ytpl(playlistID)
 
         playlist.items.forEach(item => {
             let track: Track = {
@@ -72,7 +75,6 @@ export default class PlayCommand extends Command {
             }
             this.currentList.tracks.push(track)
         })
-        
         this.join()
     }
 
@@ -91,7 +93,6 @@ export default class PlayCommand extends Command {
     private join() {
         if (!this.currentList.playing) {
             this.currentList.playing = true
-
             this.currentList.voiceChannel.join()
                 .then(conn => {
                     this.currentList.connection = conn
@@ -103,7 +104,7 @@ export default class PlayCommand extends Command {
     private play(track: Track) {
         if (!track) {
             this.currentList.playing = false
-            this.client.user.setActivity('Chillin',{
+            this.client.user.setActivity('Chillin', {
                 type: 'CUSTOM_STATUS'
             })
             return
@@ -116,7 +117,7 @@ export default class PlayCommand extends Command {
 
         this.currentList
             .connection
-            .play(ytdl(track.url.toString() , {
+            .play(ytdl(track.url.toString(), {
                 filter: 'audio',
                 highWaterMark: 1 << 25
             }))

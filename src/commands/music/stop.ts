@@ -12,13 +12,13 @@ export default class StopCommand extends Command {
     }
 
     public async exec(message: Message) {
-        const currentList : ServerQueue = await this.client.getQueue(message.guild.id)
+        const currentList: ServerQueue = await this.client.getQueue(message.guild.id)
 
         if (!PermissionCheck.isInVoiceChannel(message, currentList)) return
 
         if (currentList.playing) {
             try {
-                this.client.clearQueue(message.guild.id)  
+                this.client.clearQueue(message.guild.id)
                 currentList.voiceChannel.leave()
                 message.channel.send('Ciao')
             } catch (e) {

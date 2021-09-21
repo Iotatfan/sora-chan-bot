@@ -8,7 +8,7 @@ export default class Queue {
     public tracks: Array<Track>
     public voiceChannel: String
 
-    constructor (guildID, message) {
+    constructor(guildID, message) {
         this.connection = this.connection
         this.guildID = guildID
         this.playing = false

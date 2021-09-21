@@ -11,16 +11,16 @@ export default class SkipCommand extends Command {
         })
     }
 
-    public async exec(message: Message) {        
-        const currentList : ServerQueue = await this.client.getQueue(message.guild.id)
-        
+    public async exec(message: Message) {
+        const currentList: ServerQueue = await this.client.getQueue(message.guild.id)
+
         if (!PermissionCheck.isInVoiceChannel(message, currentList)) return
 
         if (currentList.playing) {
             try {
                 currentList.connection.dispatcher.end()
                 message.channel.send(':fast_forward: Skipping Current Song')
-            } 
+            }
             catch (e) {
                 message.channel.send('Please wait for a second')
             }

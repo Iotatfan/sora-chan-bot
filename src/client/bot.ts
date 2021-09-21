@@ -6,7 +6,7 @@ export default class BotClient extends AkairoClient {
         super({
             ownerID: process.env.OWNER_ID,
         })
-        
+
     }
 
     public commandHandler: CommandHandler = new CommandHandler(this, {
@@ -22,7 +22,7 @@ export default class BotClient extends AkairoClient {
     });
 
     public queues = this.util.collection<String, ServerQueue>()
-    
+
     private async _init() {
         this.listenerHandler.setEmitters({
             commandHandler: this.commandHandler,
@@ -33,11 +33,11 @@ export default class BotClient extends AkairoClient {
         this.listenerHandler.loadAll();
     }
 
-    public async getQueue (guildID: String) {
+    public async getQueue(guildID: String) {
         const queue = () => this.queues.get(guildID)
 
         if (!queue()) {
-            
+
             let values: ServerQueue = {
                 connection: null,
                 guildID: guildID,
@@ -50,13 +50,13 @@ export default class BotClient extends AkairoClient {
         return queue();
     }
 
-    public async setQueue (guildID: String, values) {
+    public async setQueue(guildID: String, values) {
         this.queues.set(guildID, values)
 
         return this.getQueue(guildID)
     }
 
-    public async clearQueue (guildID: String) {
+    public async clearQueue(guildID: String) {
         this.queues.delete(guildID)
     }
 
@@ -65,5 +65,5 @@ export default class BotClient extends AkairoClient {
 
         return this.login(process.env.TOKEN)
     }
-    
+
 }

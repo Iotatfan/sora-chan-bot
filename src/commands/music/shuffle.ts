@@ -11,10 +11,10 @@ export default class ShuffleCommand extends Command {
     }
 
     public async exec(message: Message) {
-        const currentList : ServerQueue = await this.client.getQueue(message.guild.id)
-        
+        const currentList: ServerQueue = await this.client.getQueue(message.guild.id)
+
         if (!currentList.playing) return message.reply("Nothing to Play")
-        
+
         if (currentList.tracks.length < 3) return message.channel.send('Queue is too short')
 
         for (let i = currentList.tracks.length - 1; i > 1; --i) {

@@ -5,7 +5,7 @@ import { Collection } from 'discord.js'
 interface BotClient {
     commandHandler: CommandHandler
     queues: Collection<String, ServerQueue>
-    
+
     getQueue(guildID: String): Promise<ServerQueue>
     setQueue(guildID: String, values: ServerQueue): Promise<ServerQueue>
     clearQueue(guildID: String): void
