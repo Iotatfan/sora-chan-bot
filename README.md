@@ -1,3 +1,2 @@
-# iotatfans-diva
-
-Just another Discord Music Bot
+# Sora-chan
+Personal Discord Music Bot
