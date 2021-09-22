@@ -1,7 +1,7 @@
 {
-  "name": "iotatfans-dive",
+  "name": "sora-discord-bot",
   "version": "1.0.0",
-  "description": "Diva",
+  "description": "Discord Music Player",
   "main": "index.js",
   "scripts": {
     "start": "node build/index.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Iotatfan/iotatfans-diva.git"
+    "url": "git+https://github.com/Iotatfan/sora-discord-bot.git"
   },
   "author": "Iotatfan",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Iotatfan/iotatfans-diva/issues"
+    "url": "https://github.com/Iotatfan/sora-discord-bot/issues"
   },
-  "homepage": "https://github.com/Iotatfan/iotatfans-diva#readme",
+  "homepage": "https://github.com/Iotatfan/sora-discord-bot#readme",
   "dependencies": {
     "@discordjs/opus": "^0.4.0",
     "@types/node": "^14.14.22",

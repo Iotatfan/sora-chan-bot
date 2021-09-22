@@ -5,6 +5,9 @@ const client = new BotClient()
 
 client.on('ready', () => {
     console.log("I'm Ready")
+    client.user.setActivity('Some Music', {
+        type: 'PLAYING'
+    })
 })
 
 client.on('error', (err) => {

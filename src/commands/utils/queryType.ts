@@ -3,9 +3,8 @@ import * as ytpl from 'ytpl'
 
 export default class QueryResolver {
 
-    static isSpotifyPlaylist(query) {
+    static isSpotifyLink(query) {
         const spotifyRegex = /^(?:spotify:|https:\/\/[a-z]+\.spotify\.com\/(track\/|playlist\/))(.*)$/
-        console.log(spotifyRegex.test(query))
         return spotifyRegex.test(query)
     }
 

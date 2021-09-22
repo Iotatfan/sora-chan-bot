@@ -38,14 +38,14 @@ export default class PlayCommand extends Command {
             this._handleYtPlaylist(query)
         } else if (QueryResolver.isYTVideo(query)) {
             this._handleYtVideo(query)
-        } else if (QueryResolver.isSpotifyPlaylist(query)) {
-            this._handleSpotifyPlaylist(query)
+        } else if (QueryResolver.isSpotifyLink(query)) {
+            this._handleSpotifyLink(query)
         } else {
             this._searchYtVideo(query, true)
         }
     }
 
-    private async _handleSpotifyPlaylist(query) {
+    private async _handleSpotifyLink(query) {
         let data = await SpotifyWebApi.getTracks(query)
 
         data.forEach(item => {
@@ -102,18 +102,12 @@ export default class PlayCommand extends Command {
     }
 
     private play(track: Track) {
-        if (!track) {
+        if (!track || this.currentList == null) {
             this.currentList.playing = false
-            this.client.user.setActivity('Chillin', {
-                type: 'CUSTOM_STATUS'
-            })
             return
         }
 
         this.currentList.playing = true
-        this.client.user.setActivity(track.title.toString(), {
-            type: 'LISTENING'
-        })
 
         this.currentList
             .connection

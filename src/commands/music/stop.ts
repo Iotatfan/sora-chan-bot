@@ -7,7 +7,7 @@ export default class StopCommand extends Command {
     constructor() {
         super('stop', {
             aliases: ['Stop'],
-            description: 'Stop playing music',
+            description: 'Stop playing music then leave voice channel',
         })
     }
 
@@ -18,9 +18,10 @@ export default class StopCommand extends Command {
 
         if (currentList.playing) {
             try {
-                this.client.clearQueue(message.guild.id)
-                currentList.voiceChannel.leave()
-                message.channel.send('Ciao')
+                currentList.connection.dispatcher.destroy()
+                currentList.tracks = []
+                currentList.playing = false
+                message.channel.send('Music stopped')
             } catch (e) {
                 console.log(e)
             }
