@@ -46,7 +46,7 @@ export default class PlayCommand extends Command {
     }
 
     private async _handleSpotifyLink(query) {
-        let data = await SpotifyWebApi.getTracks(query)
+        const data = await SpotifyWebApi.getTracks(query)
 
         data.forEach(item => {
             const searchString = `${item.artists[0].name} ${item.name}`
@@ -68,7 +68,7 @@ export default class PlayCommand extends Command {
         const playlist = await ytpl(playlistID)
 
         playlist.items.forEach(item => {
-            let track: Track = {
+            const track: Track = {
                 title: item.title,
                 url: item.url,
                 user: this.message.author.id
@@ -102,7 +102,7 @@ export default class PlayCommand extends Command {
     }
 
     private play(track: Track) {
-        if (!track || this.currentList == null) {
+        if (!track || this.currentList === null) {
             this.currentList.playing = false
             return
         }

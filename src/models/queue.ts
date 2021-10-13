@@ -1,7 +1,7 @@
 import { StreamDispatcher } from 'discord.js'
-import Track from './track'
+import { Track } from './track'
 
-export default class Queue {
+export class Queue {
     public connection: StreamDispatcher
     public guildID: String
     public playing: Boolean
@@ -14,9 +14,5 @@ export default class Queue {
         this.playing = false
         this.tracks = []
         this.voiceChannel = message.member.voice.channel
-    }
-
-    get nowPlaying() {
-        return this.tracks[0];
     }
 }

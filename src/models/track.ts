@@ -1,4 +1,4 @@
-export default class Track {
+export class Track {
 
     public url: String
     public user: String

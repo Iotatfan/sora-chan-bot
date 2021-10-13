@@ -11,7 +11,6 @@ export default class SearchYoutubeVideo {
     public async search(message: Message, query, wait) {
         this.wait = wait
         this.query = query
-        // this.query = message.content.substr(message.content.indexOf(' ') + 1)
         const filters1 = await ytsr.getFilters(this.query.toString())
         const filter1 = filters1.get('Type').get('Video')
         const options = {
@@ -37,12 +36,15 @@ export default class SearchYoutubeVideo {
             .setTitle(`Search Result for ${this.query}`)
 
         searchResults.forEach((result, index) => embed.addField(`${index + 1}. ${result.title}`, '\u200B', false))
+        embed.addField(`Type "cancel" to cancel the command`, '\u200B', false)
 
         message.channel.send(embed)
             .then(msg => msg.delete({
                 timeout: 10000
             }))
-            .catch(err => { })
+            .catch(err => {
+                console.log(err)
+            })
 
         await message.channel.awaitMessages(filter, {
             max: 1,
@@ -54,11 +56,10 @@ export default class SearchYoutubeVideo {
             }
             this.response = collected.first().content
         }).catch(() => {
-            message.reply("Tired waiting for you")
+            message.reply("Tired waiting for you, so I choose this one")
         })
 
         if (this.response) this.addToQueue(message, searchResults)
-
     }
 
     private addToQueue(message: Message, searchResults) {

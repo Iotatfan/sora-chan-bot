@@ -1,5 +1,3 @@
-import { CommandHandler } from "discord-akairo";
-
 import { Listener } from 'discord-akairo'
 import { Message } from 'discord.js'
 

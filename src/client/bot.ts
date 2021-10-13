@@ -38,7 +38,7 @@ export default class BotClient extends AkairoClient {
 
         if (!queue()) {
 
-            let values: ServerQueue = {
+            const values: ServerQueue = {
                 connection: null,
                 guildID: guildID,
                 playing: false,
@@ -56,7 +56,7 @@ export default class BotClient extends AkairoClient {
         return this.getQueue(guildID)
     }
 
-    public async clearQueue(guildID: String) {
+    public clearQueue(guildID: String) {
         this.queues.delete(guildID)
     }
 
