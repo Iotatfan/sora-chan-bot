@@ -1,10 +1,12 @@
 import { AkairoClient, CommandHandler, ListenerHandler } from 'discord-akairo';
+import { Client, Intents } from 'discord.js';
 import { ServerQueue } from '../../typings'
 
 export default class BotClient extends AkairoClient {
     constructor() {
         super({
             ownerID: process.env.OWNER_ID,
+            intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.GUILD_VOICE_STATES]
         })
 
     }
@@ -43,7 +45,8 @@ export default class BotClient extends AkairoClient {
                 guildID: guildID,
                 playing: false,
                 tracks: [],
-                voiceChannel: null,
+                subs: null,
+                channelID: null
             }
             await this.setQueue(guildID, values)
         }

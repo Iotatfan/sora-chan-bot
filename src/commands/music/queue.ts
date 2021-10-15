@@ -18,7 +18,7 @@ export default class QueueCommand extends Command {
         const tracks = currentList.tracks
 
         const embed = new MessageEmbed()
-            .setColor('00FF00')
+            .setColor('#00FF00')
             .setTitle('Now Playing')
             .setURL(tracks[0].url.toString())
             .setDescription(`${tracks[0].title}`)
@@ -31,6 +31,6 @@ export default class QueueCommand extends Command {
             .filter((track, index) => index > 0 && index < 11)
             .forEach((track, index) => embed.addField(`${index + 1}. ${track.title} `, `Requested by: <@${track.user}>`, false))
 
-        message.channel.send(embed)
+        message.channel.send({ embeds: [embed] })
     }
 }

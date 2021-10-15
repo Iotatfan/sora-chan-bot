@@ -18,7 +18,8 @@ export default class StopCommand extends Command {
 
         if (currentList.playing) {
             try {
-                currentList.connection.dispatcher.destroy()
+                currentList.subs.player.stop()
+                currentList.subs.unsubscribe()
                 currentList.tracks = []
                 currentList.playing = false
                 message.channel.send('Music stopped')

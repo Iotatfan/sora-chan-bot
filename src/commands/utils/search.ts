@@ -32,34 +32,32 @@ export default class SearchYoutubeVideo {
         const filter = m => m.author.id == message.author.id
 
         const embed = new MessageEmbed()
-            .setColor('00FF00')
+            .setColor('#00FF00')
             .setTitle(`Search Result for ${this.query}`)
 
         searchResults.forEach((result, index) => embed.addField(`${index + 1}. ${result.title}`, '\u200B', false))
         embed.addField(`Type "cancel" to cancel the command`, '\u200B', false)
 
-        message.channel.send(embed)
-            .then(msg => msg.delete({
-                timeout: 10000
-            }))
-            .catch(err => {
-                console.log(err)
+        message.channel.send({ embeds: [embed] })
+            .then(msg => {
+                setTimeout(() => {
+                    try {
+                        msg.delete()
+                    } catch (err) {
+                        console.log(err)
+                    }
+                }, 10000)
             })
 
-        await message.channel.awaitMessages(filter, {
-            max: 1,
-            time: 10000,
-            errors: ['time']
-        }).then(async (collected) => {
-            if (collected.first().content.toLowerCase() == 'cancel') {
-                message.reply("Command has been cancelled")
-            }
-            this.response = collected.first().content
-        }).catch(() => {
-            message.reply("Tired waiting for you, so I choose this one")
-        })
-
-        if (this.response) this.addToQueue(message, searchResults)
+        await message.channel.awaitMessages({ filter: filter, max: 1, time: 10000, errors: ['time'] })
+            .then(async collected => {
+                collected.first().content.toLowerCase() === 'cancel'
+                    ? message.reply("Command has been cancelled")
+                    : this.addToQueue(message, searchResults)
+            })
+            .catch(() => {
+                message.reply("Tired waiting for you, so I choose this one")
+            })
     }
 
     private addToQueue(message: Message, searchResults) {
@@ -75,12 +73,12 @@ export default class SearchYoutubeVideo {
 
         if (this.wait) {
             const embed = new MessageEmbed()
-                .setColor('00FF00')
+                .setColor('#00FF00')
                 .setTitle('Added to Queue')
                 .setURL(this.track.url.toString())
                 .setDescription(`${this.track.title}`)
 
-            message.channel.send(embed)
+            message.channel.send({ embeds: [embed] })
         }
     }
 }

@@ -12,10 +12,10 @@ export default class HelpCommand extends Command {
 
     public async exec(message: Message) {
         const embed = new MessageEmbed()
-            .setColor('00FF00')
+            .setColor('#00FF00')
             .setTitle('Click here to see commands list')
             .setURL('https://iotatfan.github.io/sora-chan-web/#/commands')
 
-        message.channel.send(embed)
+        message.channel.send({embeds: [embed]})
     }
 }

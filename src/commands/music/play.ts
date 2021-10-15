@@ -1,5 +1,13 @@
 import { Command } from 'discord-akairo'
 import { Message } from 'discord.js'
+import {
+    AudioPlayer,
+    AudioResource,
+    createAudioPlayer,
+    createAudioResource,
+    joinVoiceChannel,
+    AudioPlayerStatus
+} from '@discordjs/voice'
 import { ServerQueue, Track } from '../../../typings'
 import SpotifyWebApi from 'spotify-url-info'
 import QueryResolver from '../utils/queryType'
@@ -13,20 +21,22 @@ export default class PlayCommand extends Command {
     private currentList: ServerQueue
     private message: Message
     private searchYtVideo: SearchYoutubeVideo = new SearchYoutubeVideo()
+    private player: AudioPlayer
+    private audioResource: AudioResource
 
     constructor() {
         super('play', {
             aliases: ['Play', 'p'],
             description: 'Play or Add Music to Queue'
         })
+
+        this.player = createAudioPlayer()
     }
 
     public async exec(message: Message) {
         this.message = message
-        const voiceChannel = message.member.voice.channel
         const query = message.content.substr(message.content.indexOf(' ') + 1)
         this.currentList = await this.client.getQueue(message.guild.id)
-        this.currentList.voiceChannel = voiceChannel
 
         if (!PermissionCheck.isInVoiceChannel(message, this.currentList)) return
 
@@ -91,17 +101,24 @@ export default class PlayCommand extends Command {
     }
 
     private join() {
+        const channel = this.message.member.voice.channel
+        this.currentList.channelID = channel.id
+
         if (!this.currentList.playing) {
             this.currentList.playing = true
-            this.currentList.voiceChannel.join()
-                .then(conn => {
-                    this.currentList.connection = conn
-                    this.play(this.currentList.tracks[0])
-                })
+
+            const connection = joinVoiceChannel({
+                channelId: channel.id,
+                guildId: channel.guildId,
+                adapterCreator: channel.guild.voiceAdapterCreator
+            })
+
+            this.currentList.connection = connection
+            this.play(this.currentList.tracks[0])
         }
     }
 
-    private play(track: Track) {
+    private async play(track: Track) {
         if (!track || this.currentList === null) {
             this.currentList.playing = false
             return
@@ -109,22 +126,32 @@ export default class PlayCommand extends Command {
 
         this.currentList.playing = true
 
-        this.currentList
-            .connection
-            .play(ytdl(track.url.toString(), {
-                filter: 'audio',
-                highWaterMark: 1 << 25
-            }))
-            .on('finish', () => {
-                this.currentList.tracks.shift()
-                this.play(this.currentList.tracks[0])
-            })
-            .on('error', err => {
-                console.log(err)
+        let stream = createAudioResource(ytdl(track.url.toString(), {
+            filter: 'audioonly',
+            dlChunkSize: 0,
+            highWaterMark: 1 << 25
+        }))
+        this.currentList.subs = this.currentList.connection.subscribe(this.player)
 
-                if (err.code === 'EPIPE') return this.play(this.currentList.tracks[0])
+        await this.player.play(stream)
 
-                this.play(this.currentList.tracks[0])
-            })
+        await this.player.on(AudioPlayerStatus.Idle, () => {
+            this.player.play(this.nextTrack())
+        })
+
+        await this.player.on('error', error => {
+            console.log(error)
+        })
+    }
+
+    private nextTrack() {
+        this.currentList.tracks.shift()
+
+        return createAudioResource(ytdl(this.currentList.tracks[0].url.toString(), {
+            filter: 'audioonly',
+            dlChunkSize: 0,
+            highWaterMark: 1 << 25
+        }))
+
     }
 }

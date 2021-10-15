@@ -1,6 +1,6 @@
+import { PlayerSubscription, VoiceConnection } from '@discordjs/voice'
 import { CommandHandler } from 'discord-akairo'
-import { VoiceChannel } from 'discord.js'
-import { Collection } from 'discord.js'
+import { Collection, VoiceChannel } from 'discord.js'
 
 interface BotClient {
     commandHandler: CommandHandler
@@ -16,11 +16,12 @@ declare module 'discord.js' {
 }
 
 export interface ServerQueue {
-    connection
+    connection: VoiceConnection
     guildID: String
     playing: Boolean
     tracks: Track[]
-    voiceChannel: VoiceChannel
+    subs: PlayerSubscription
+    channelID: String
 }
 
 export interface Track {

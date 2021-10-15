@@ -18,7 +18,7 @@ export default class SkipCommand extends Command {
 
         if (currentList.playing) {
             try {
-                currentList.connection.dispatcher.end()
+                currentList.subs.player.stop()
                 message.channel.send(':fast_forward: Skipping Current Song')
             }
             catch (e) {

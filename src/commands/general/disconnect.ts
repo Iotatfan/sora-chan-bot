@@ -20,7 +20,7 @@ export default class DisconnectCommand extends Command {
 
         try {
             this.client.clearQueue(message.guild.id)
-            this.currentList.voiceChannel.leave()
+            this.currentList.connection.destroy()
             message.channel.send(`Ciao`)
         } catch (e) {
             console.log(e)

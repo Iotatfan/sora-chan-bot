@@ -4,8 +4,8 @@ import { ServerQueue } from '../../../typings'
 export default class PermissionCheck {
 
     static isInVoiceChannel(message: Message, currentList: ServerQueue) {
-        const userVoiceChannel = message.member.voice.channel
-        const joinedVoiceChannel = currentList.voiceChannel
+        const userVoiceChannel = message.member.voice.channel.id
+        const joinedVoiceChannel = currentList.channelID
 
         if (!userVoiceChannel) {
             message.channel.send(
