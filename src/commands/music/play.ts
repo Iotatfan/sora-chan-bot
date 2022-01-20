@@ -6,7 +6,8 @@ import {
     createAudioPlayer,
     createAudioResource,
     joinVoiceChannel,
-    AudioPlayerStatus
+    AudioPlayerStatus,
+    DiscordGatewayAdapterCreator
 } from '@discordjs/voice'
 import { ServerQueue, Track } from '../../../typings'
 import SpotifyWebApi from 'spotify-url-info'
@@ -109,7 +110,7 @@ export default class PlayCommand extends Command {
             const connection = joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guildId,
-                adapterCreator: channel.guild.voiceAdapterCreator
+                adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
             })
 
             this.currentList.connection = connection
@@ -135,6 +136,7 @@ export default class PlayCommand extends Command {
 
         await this.player.on('error', error => {
             console.log(error)
+            this.message.channel.send(error.message)
         })
     }
 

@@ -38,6 +38,7 @@ export default class SearchYoutubeVideo {
                         msg.delete()
                     } catch (err) {
                         console.log(err)
+                        message.channel.send(err.message)
                     }
                 }, 10000)
             })

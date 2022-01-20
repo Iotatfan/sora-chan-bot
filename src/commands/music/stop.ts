@@ -24,8 +24,9 @@ export default class StopCommand extends Command {
                 currentList.tracks = []
                 currentList.playing = false
                 message.channel.send('Music stopped')
-            } catch (e) {
-                console.log(e)
+            } catch (err) {
+                console.log(err)
+                message.channel.send(err.message)
             }
         }
 
