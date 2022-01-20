@@ -3,7 +3,6 @@ import { Track } from '../../../typings'
 import ytsr = require('ytsr')
 
 export default class SearchYoutubeVideo {
-    private response: string = '1'
     private track: Track
     private query: String
     private wait: boolean
@@ -18,13 +17,7 @@ export default class SearchYoutubeVideo {
         }
         const searchResults = (await ytsr(filter1.url, options)).items
 
-        try {
-            wait ? await this.waitUserResponse(message, searchResults) : this.addToQueue(message, searchResults)
-
-        } catch (e) {
-            message.channel.send('Invalid input')
-        }
-
+        await this.waitUserResponse(message, searchResults)
         return this.track
     }
 
@@ -45,6 +38,7 @@ export default class SearchYoutubeVideo {
                         msg.delete()
                     } catch (err) {
                         console.log(err)
+                        message.channel.send(err.message)
                     }
                 }, 10000)
             })
@@ -53,15 +47,15 @@ export default class SearchYoutubeVideo {
             .then(async collected => {
                 collected.first().content.toLowerCase() === 'cancel'
                     ? message.reply("Command has been cancelled")
-                    : this.addToQueue(message, searchResults)
+                    : this.addToQueue(message, searchResults, collected.first().content)
             })
             .catch(() => {
-                message.reply("Tired waiting for you, so I choose this one")
+                message.reply("Tired waiting for you")
             })
     }
 
-    private addToQueue(message: Message, searchResults) {
-        const index = parseInt(this.response) - 1
+    private addToQueue(message: Message, searchResults, response) {
+        const index = parseInt(response) - 1
 
         if (!searchResults[index]) return message.reply("That's illegal")
 

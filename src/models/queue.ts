@@ -1,8 +1,8 @@
-import { StreamDispatcher } from 'discord.js'
+import { VoiceConnection } from '@discordjs/voice'
 import { Track } from './track'
 
 export class Queue {
-    public connection: StreamDispatcher
+    public connection: VoiceConnection
     public guildID: String
     public playing: Boolean
     public tracks: Array<Track>

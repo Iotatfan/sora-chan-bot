@@ -6,7 +6,8 @@ import {
     createAudioPlayer,
     createAudioResource,
     joinVoiceChannel,
-    AudioPlayerStatus
+    AudioPlayerStatus,
+    DiscordGatewayAdapterCreator
 } from '@discordjs/voice'
 import { ServerQueue, Track } from '../../../typings'
 import SpotifyWebApi from 'spotify-url-info'
@@ -22,7 +23,6 @@ export default class PlayCommand extends Command {
     private message: Message
     private searchYtVideo: SearchYoutubeVideo = new SearchYoutubeVideo()
     private player: AudioPlayer
-    private audioResource: AudioResource
 
     constructor() {
         super('play', {
@@ -110,45 +110,39 @@ export default class PlayCommand extends Command {
             const connection = joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guildId,
-                adapterCreator: channel.guild.voiceAdapterCreator
+                adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
             })
 
             this.currentList.connection = connection
-            this.play(this.currentList.tracks[0])
+            this.streamTrack(this.createStream())
         }
     }
 
-    private async play(track: Track) {
-        if (!track || this.currentList === null) {
-            this.currentList.playing = false
-            return
-        }
-
+    private async streamTrack(stream: AudioResource) {
+        this.currentList.subs = this.currentList.connection.subscribe(this.player)
+        await this.player.play(stream)
         this.currentList.playing = true
 
-        let stream = createAudioResource(ytdl(track.url.toString(), {
-            filter: 'audioonly',
-            dlChunkSize: 0,
-            highWaterMark: 1 << 25
-        }))
-        this.currentList.subs = this.currentList.connection.subscribe(this.player)
-
-        await this.player.play(stream)
-
         await this.player.on(AudioPlayerStatus.Idle, () => {
-            this.player.play(this.nextTrack())
+            this.currentList.tracks.shift()
+
+            if (!this.currentList.tracks[0] || this.currentList === null) {
+                this.currentList.playing = false
+                return
+            } else {
+                this.player.play(this.createStream())
+            }
         })
 
         await this.player.on('error', error => {
             console.log(error)
+            this.message.channel.send(error.message)
         })
     }
 
-    private nextTrack() {
-        this.currentList.tracks.shift()
-
+    private createStream() {
         return createAudioResource(ytdl(this.currentList.tracks[0].url.toString(), {
-            filter: 'audioonly',
+            filter: 'audio',
             dlChunkSize: 0,
             highWaterMark: 1 << 25
         }))

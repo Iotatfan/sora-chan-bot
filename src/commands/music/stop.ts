@@ -1,3 +1,4 @@
+import { AudioPlayerStatus } from '@discordjs/voice'
 import { Command } from 'discord-akairo'
 import { Message } from 'discord.js'
 import { ServerQueue } from '../../../typings'
@@ -16,15 +17,16 @@ export default class StopCommand extends Command {
 
         if (!PermissionCheck.isInVoiceChannel(message, currentList)) return
 
-        if (currentList.playing) {
+        if (currentList.subs.player.state.status !== AudioPlayerStatus.Idle) {
             try {
                 currentList.subs.player.stop()
                 currentList.subs.unsubscribe()
                 currentList.tracks = []
                 currentList.playing = false
                 message.channel.send('Music stopped')
-            } catch (e) {
-                console.log(e)
+            } catch (err) {
+                console.log(err)
+                message.channel.send(err.message)
             }
         }
 
