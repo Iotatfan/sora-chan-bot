@@ -5,19 +5,19 @@ import ytsr = require('ytsr')
 export default class SearchYoutubeVideo {
     private track: Track
     private query: String
-    private wait: boolean
+    private waitForRespone: boolean
 
-    public async search(message: Message, query, wait) {
-        this.wait = wait
+    public async search(message: Message, query, waitForRespone) {
+        this.waitForRespone = waitForRespone
         this.query = query
         const filters1 = await ytsr.getFilters(this.query.toString())
         const filter1 = filters1.get('Type').get('Video')
         const options = {
-            limit: wait ? 5 : 1
+            limit: waitForRespone ? 5 : 1
         }
         const searchResults = (await ytsr(filter1.url, options)).items
 
-        await this.waitUserResponse(message, searchResults)
+        waitForRespone ? await this.waitUserResponse(message, searchResults) : this.addToQueue(message, searchResults, 1)
         return this.track
     }
 
@@ -65,7 +65,7 @@ export default class SearchYoutubeVideo {
             user: message.author.id
         }
 
-        if (this.wait) {
+        if (this.waitForRespone) {
             const embed = new MessageEmbed()
                 .setColor('#00FF00')
                 .setTitle('Added to Queue')
