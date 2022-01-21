@@ -8,7 +8,7 @@ export default class StopCommand extends Command {
     constructor() {
         super('stop', {
             aliases: ['Stop'],
-            description: 'Stop playing music then leave voice channel',
+            description: 'Stop playing music & clear the queue',
         })
     }
 
@@ -19,9 +19,9 @@ export default class StopCommand extends Command {
 
         if (currentList.subs.player.state.status !== AudioPlayerStatus.Idle) {
             try {
+                currentList.tracks = []
                 currentList.subs.player.stop()
                 currentList.subs.unsubscribe()
-                currentList.tracks = []
                 currentList.playing = false
                 message.channel.send('Music stopped')
             } catch (err) {
@@ -29,6 +29,5 @@ export default class StopCommand extends Command {
                 message.channel.send(err.message)
             }
         }
-
     }
 }
