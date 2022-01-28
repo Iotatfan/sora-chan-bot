@@ -2,7 +2,7 @@
   "name": "sora-discord-bot",
   "version": "1.0.0",
   "engines": {
-    "node": "^16.6.0"
+    "node": "^16.10.0"
   },
   "description": "Discord Music Player",
   "main": "index.js",
